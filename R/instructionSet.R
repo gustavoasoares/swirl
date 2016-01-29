@@ -182,12 +182,19 @@ testResponse.default <- function(current.row, e){
     if(is(current.row, "cmd_question") && !is(e, "datacamp")) {
       mes <- paste(mes, "Or, type info() for more options.")
     }
-    hint <- current.row[,"Hint"]
+    #hint <- current.row[,"Hint"]
+    hint <- generateHint()
     post_result(e, passed = correct, feedback = mes, hint = if(is.na(hint)) NULL else hint)
     e$iptr <- e$iptr - 1
   }
   # reset skipped info
   e$skipped <- FALSE
+}
+
+
+#TODO: Gustavo: create a function to generate two different hints based on the results of the test
+generateHint <- function() {
+  "This is a test"
 }
 
 testMe <- function(keyphrase, e){
