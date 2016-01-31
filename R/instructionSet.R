@@ -183,7 +183,7 @@ testResponse.default <- function(current.row, e){
       mes <- paste(mes, "Or, type info() for more options.")
     }
     #hint <- current.row[,"Hint"]
-    hint <- generateHint()
+    hint <- get_smart_hints(results)
     post_result(e, passed = correct, feedback = mes, hint = if(is.na(hint)) NULL else hint)
     e$iptr <- e$iptr - 1
   }
@@ -191,11 +191,13 @@ testResponse.default <- function(current.row, e){
   e$skipped <- FALSE
 }
 
-
-#TODO: Gustavo: create a function to generate two different hints based on the results of the test
-generateHint <- function() {
-  "This is a test"
+get_smart_hints <- function(results) {
+  list_results <- Filter(function(x) is.list(x), results)
+  list_results  <- Filter(function(x) "hint" %in% names(x), list_results)
+  lapply(list_results, function(x) x$hint)
 }
+
+
 
 testMe <- function(keyphrase, e){
   # patch to accommodate old-style tests
