@@ -182,8 +182,9 @@ testResponse.default <- function(current.row, e){
     if(is(current.row, "cmd_question") && !is(e, "datacamp")) {
       mes <- paste(mes, "Or, type info() for more options.")
     }
-    #hint <- current.row[,"Hint"]
-    hint <- get_smart_hints(results)
+    #if the results contains a hint based on the student's 
+    #answer, use it. Otherwise, use the default static hint
+    hint <- if (hasSmartHint(results)) getSmartHints(results) else current.row[,"Hint"]
     post_result(e, passed = correct, feedback = mes, hint = if(is.na(hint)) NULL else hint)
     e$iptr <- e$iptr - 1
   }
@@ -191,13 +192,20 @@ testResponse.default <- function(current.row, e){
   e$skipped <- FALSE
 }
 
-get_smart_hints <- function(results) {
-  list_results <- Filter(function(x) is.list(x), results)
-  list_results  <- Filter(function(x) "hint" %in% names(x), list_results)
-  lapply(list_results, function(x) x$hint)
+getResultsWithHints <- function(results) {
+  #if the result contains a hint, it will be a list with 
+  #a named member "hint" 
+  listResults <- Filter(function(x) is.list(x), results)
+  listResults  <- Filter(function(x) "hint" %in% names(x), listResults)
 }
 
+hasSmartHint <- function(results) {
+  return(length(getResultsWithHints(results)) > 0)
+}
 
+getSmartHints <- function(results) {
+  lapply(getResultsWithHints(results), function(x) x$hint)
+}
 
 testMe <- function(keyphrase, e){
   # patch to accommodate old-style tests
